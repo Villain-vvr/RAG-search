@@ -15,6 +15,7 @@
     "@google/generative-ai": "^0.3.0",
     "jszip": "^3.10.1",
     "xlsx": "^0.18.5",
+        "lucide-react": "^0.294.0",
     "pdfjs-dist": "^4.3.136"
   },
   "devDependencies": {
