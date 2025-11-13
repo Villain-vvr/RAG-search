@@ -129,6 +129,8 @@ const App = () => {
       const response = await fetch(rawUrl);
       if (!response.ok) throw new Error('Failed to fetch GitHub data');
       
+      const text = await response.text();
+      
       // Try to parse as JSON first
       let items: DataItem[] = [];
       try {
