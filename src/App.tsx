@@ -237,9 +237,14 @@ const App = () => {
                 placeholder="Enter data URL..."
                 className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
-              <button className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-                Load Data
-              </button>
+              <button 
+                className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                onClick={handleLoadFromUrl}
+               disabled={loading || !dataUrl.trim()}
+            >
+              Load Data
+           </button>
+
             </div>
           )}
 
@@ -253,8 +258,13 @@ const App = () => {
                 placeholder="Enter GitHub repository URL..."
                 className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
-              <button className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+              <button 
+                className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                onClick={handleLoadFromGithub}
+                disabled={loading || !githubUrl.trim()}
+              >
                 Load Repository
+              
               </button>
             </div>
           )}
