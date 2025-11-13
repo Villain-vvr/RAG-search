@@ -72,15 +72,35 @@ const App = () => {
       if (!response.ok) throw new Error('Failed to fetch data');
       
       const text = await response.text();
-      const items = text.split('\n')
-        .filter(line => line.trim())
-        .map((content, idx) => ({
-          id: `url-${idx}`,
-          content,
-          source: dataUrl,
-        }));
-      
-      setData(prev => [...prev, ...items]);
+      // Try to parse as JSON first
+      let items: DataItem[] = [];
+      try {
+        const jsonData = JSON.parse(text);
+        // Handle JSON array
+        if (Array.isArray(jsonData)) {
+          items = jsonData.map((item, idx) => ({
+            id: `url-${idx}`,
+            content: typeof item === 'string' ? item : JSON.stringify(item),
+            source: dataUrl,
+          }));
+        } else {
+          // Handle single JSON object
+          items = [{
+            id: 'url-0',
+            content: JSON.stringify(jsonData),
+            source: dataUrl,
+          }];
+        }
+      } catch {
+        // If JSON parsing fails, treat as CSV/text
+        items = text.split('\n')
+          .filter(line => line.trim())
+          .map((content, idx) => ({
+            id: `url-${idx}`,
+            content,
+            source: dataUrl,
+          }));
+      }      setData(prev => [...prev, ...items]);
       setDataUrl('');
       setError('');
     } catch (err) {
@@ -109,16 +129,35 @@ const App = () => {
       const response = await fetch(rawUrl);
       if (!response.ok) throw new Error('Failed to fetch GitHub data');
       
-      const text = await response.text();
-      const items = text.split('\n')
-        .filter(line => line.trim())
-        .map((content, idx) => ({
-          id: `github-${idx}`,
-          content,
-          source: githubUrl,
-        }));
-      
-      setData(prev => [...prev, ...items]);
+      // Try to parse as JSON first
+      let items: DataItem[] = [];
+      try {
+        const jsonData = JSON.parse(text);
+        // Handle JSON array
+        if (Array.isArray(jsonData)) {
+          items = jsonData.map((item, idx) => ({
+            id: `github-${idx}`,
+            content: typeof item === 'string' ? item : JSON.stringify(item),
+            source: githubUrl,
+          }));
+        } else {
+          // Handle single JSON object
+          items = [{
+            id: 'github-0',
+            content: JSON.stringify(jsonData),
+            source: githubUrl,
+          }];
+        }
+      } catch {
+        // If JSON parsing fails, treat as CSV/text
+        items = text.split('\n')
+          .filter(line => line.trim())
+          .map((content, idx) => ({
+            id: `github-${idx}`,
+            content,
+            source: githubUrl,
+          }));
+      }      setData(prev => [...prev, ...items]);
       setGithubUrl('');
       setError('');
     } catch (err) {
