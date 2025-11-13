@@ -14,6 +14,8 @@ const App = () => {
   const [error, setError] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+    const [dataUrl, setDataUrl] = useState('');
+  const [githubUrl, setGithubUrl] = useState('');
 
   const processFile = async (file: File) => {
     try {
@@ -54,6 +56,76 @@ const App = () => {
 
   const handleDragLeave = () => {
     setIsDragging(false);
+  };
+
+    const handleLoadFromUrl = async () => {
+    if (!dataUrl.trim()) {
+      setError('Please enter a valid URL');
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      setError('');
+      
+      const response = await fetch(dataUrl);
+      if (!response.ok) throw new Error('Failed to fetch data');
+      
+      const text = await response.text();
+      const items = text.split('\n')
+        .filter(line => line.trim())
+        .map((content, idx) => ({
+          id: `url-${idx}`,
+          content,
+          source: dataUrl,
+        }));
+      
+      setData(prev => [...prev, ...items]);
+      setDataUrl('');
+      setError('');
+    } catch (err) {
+      setError('Failed to load data from URL. Please check the URL and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLoadFromGithub = async () => {
+    if (!githubUrl.trim()) {
+      setError('Please enter a valid GitHub URL');
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      setError('');
+      
+      // Convert GitHub URL to raw content URL
+      let rawUrl = githubUrl;
+      if (githubUrl.includes('github.com') && githubUrl.includes('/blob/')) {
+        rawUrl = githubUrl.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+      }
+      
+      const response = await fetch(rawUrl);
+      if (!response.ok) throw new Error('Failed to fetch GitHub data');
+      
+      const text = await response.text();
+      const items = text.split('\n')
+        .filter(line => line.trim())
+        .map((content, idx) => ({
+          id: `github-${idx}`,
+          content,
+          source: githubUrl,
+        }));
+      
+      setData(prev => [...prev, ...items]);
+      setGithubUrl('');
+      setError('');
+    } catch (err) {
+      setError('Failed to load data from GitHub. Please check the URL and try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSearch = async () => {
@@ -160,6 +232,8 @@ const App = () => {
               <h3 className="text-white text-lg font-semibold mb-4">Load from URL</h3>
               <input
                 type="url"
+                              value={dataUrl}
+              onChange={(e) => setDataUrl(e.target.value)}
                 placeholder="Enter data URL..."
                 className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
@@ -174,6 +248,8 @@ const App = () => {
               <h3 className="text-white text-lg font-semibold mb-4">Load from GitHub</h3>
               <input
                 type="text"
+                              value={githubUrl}
+              onChange={(e) => setGithubUrl(e.target.value)}
                 placeholder="Enter GitHub repository URL..."
                 className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
